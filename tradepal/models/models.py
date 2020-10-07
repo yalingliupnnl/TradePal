@@ -1,0 +1,272 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Sep 25 13:12:16 2020
+
+@author: yalingliu
+"""
+
+
+import os
+import pandas as pd
+import numpy as np
+import datetime as dt 
+import matplotlib.pyplot as plt
+import pickle
+import time
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler,OneHotEncoder, LabelEncoder
+from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
+from sklearn.ensemble import AdaBoostRegressor, RandomForestRegressor,AdaBoostClassifier,RandomForestClassifier
+from sklearn.model_selection import train_test_split, learning_curve, GridSearchCV
+from sklearn import metrics, svm
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.neural_network import MLPRegressor
+from indicators import get_XY_data
+
+
+ 		   	  			  	 		  		  		    	 		 		   		 		  
+# from tradinghelper import util as ut 		   	  			  	 		  		  		    	 		 		   		 		  
+import random  		 
+# import RTLearner as rt	
+# import BagLearner as bl
+# import matplotlib.pyplot as plt
+# from indicators import compute_indicators, normalize_prices#, compute_input_df_indicators
+# from marketsimcode import compute_portvals,compute_port_stats
+# from ManualStrategy import testPolicy
+ 	  			  	 		  		  		    	 		 		   		 		  
+  		   	  			  	 		  		  		    	 		 		   		 		  
+class models(object):  		   	  			  	 		  		  		    	 		 		   		 		  
+  		   	  			  	 		  		  		    	 		 		   		 		  
+    # constructor  		   	  			  	 		  		  		    	 		 		   		 		  
+    def __init__(self, symbol = "SPY", sd=dt.datetime(1993,1,29), ed=dt.datetime(2020,8,31), impact=0.0):  
+        self.symbol = symbol
+        self.impact = impact 
+        
+        ###----------------------------------YALING, START FROM HERE!!!!!!!!!----------------------------------
+        df_dataX, df_dataY, df_indicators=get_XY_data(symbol = symbol, sd=dt.datetime(1993,1,29), 
+                                                      ed=dt.datetime(2020,8,31), impact=0.0, recent_flag=False)
+        
+        # creating instance of labelencoder
+        labelencoder = LabelEncoder()
+        df_dataY['encode']=labelencoder.fit_transform(df_dataY['dataY'])
+        
+        #one hot encoder for the trading options of buy, hold and sell
+        # enc = OneHotEncoder(handle_unknown='ignore')
+        # enc_df = pd.DataFrame(enc.fit_transform(df_dataY[['encode']]).toarray())
+        # inv_df=enc.inverse_transform(enc_df)
+        
+        X = df_dataX.values
+        # y = enc_df.values
+        y=df_dataY['encode'].values
+#        len(np.where(y==1)[0])/y.shape[0]#0.737,HOLD
+#        len(np.where(y==0)[0])/y.shape[0]#0.138, BUY
+#        len(np.where(y==2)[0])/y.shape[0]#0.125, SELL
+        
+        #Random Over-Sampling to combat imbalanced classes
+        idx_buy=np.where(y==0)[0]
+        idx_sell=np.where(y==2)[0]
+        
+        dataXY=np.column_stack((X,y))
+        
+#        buy_replica=X[idx_buy]
+        buy_replica = np.tile(dataXY[idx_buy], (3, 1))
+        sell_replica = np.tile(dataXY[idx_sell], (3, 1))
+        
+        dataXY=np.row_stack((dataXY,buy_replica,sell_replica))
+        
+        X=dataXY[:,:-1]
+        y=dataXY[:,-1]
+        
+        # split dataset into training and test set
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1)
+        
+        ####new split
+        # X_train, X_test, y_train, y_test = train_test_split(X, one_hot_trade, test_size=0.3, random_state=1)
+        
+        # inv_y_test=enc.inverse_transform(y_test)
+        # pre-process training data, fit the scaler on training data only,
+        # then standardise both training and test sets with the scaler
+        scaler = StandardScaler()
+        scaler.fit(X_train)
+        
+        self.X_train = scaler.transform(X_train)
+        self.X_test = scaler.transform(X_test)
+        self.y_train=y_train
+        self.y_test=y_test	  	
+
+    #---------------- 1: logistic regression ---------------------
+    # all parameters not specified are set to their defaults
+    def logReg(self):
+        model = LogisticRegression()
+        t_start = time.time()
+        model.fit(self.X_train, self.y_train)
+#        model.fit(X_train, y_train)
+        t_end = time.time()
+        train_time = t_end - t_start
+        print('Training time: %f seconds' % train_time)
+        
+        # save the model to disk
+        filename = 'tradepal/models/LogisticRegression_' + self.symbol+ '.sav'
+        pickle.dump(model, open(filename, 'wb'))
+         
+        # load the model from disk
+        # model = pickle.load(open(filename, 'rb'))
+        
+        t_start = time.time()
+        y_pred = model.predict(self.X_test)
+#        y_pred = model.predict(X_test)
+        t_end = time.time()
+        predict_time = t_end - t_start
+        print('Prediction time: %f seconds' % predict_time)
+        
+        # evaluation
+        # print("MSLE: {:.3f}".format(metrics.mean_squared_log_error(y_test, y_pred)))#0.179
+        # score = model.score(X_test, y_test)
+        # print(score) #0.54
+        
+        #calculate accuracy
+        correct_idx=np.where(self.y_test-y_pred==0)[0]
+#        correct_idx=np.where(y_test-y_pred==0)[0]
+        accuracy=correct_idx.shape[0]/y_pred.shape[0]#0.57
+        print('prediction accuracy is: %f' % accuracy)
+        #0.62 for 1% 3-day return, 0.76 for 1.5% 3-day return, 0.735 for 1% 2-day return
+        #0.4806 for 1% 2-day return with random over-sampling
+        return accuracy,train_time
+
+
+        # ---------------- 2: Random Forest ---------------------
+        # base = RandomForestRegressor(n_estimators=200) # 200 is a large but fair number
+    def randForest(self):
+        base = RandomForestClassifier(n_estimators=200)
+        # tune parameter: max tree depth 10
+#        scoring = metrics.make_scorer(metrics.mean_squared_log_error, greater_is_better=False)
+        max_depth_range = np.arange(10) + 1
+        tuned_params = {'max_depth': max_depth_range}
+        model = GridSearchCV(base, param_grid=tuned_params, scoring='balanced_accuracy', cv=5, iid=False)
+        
+        t_start = time.time()
+        model.fit(self.X_train, self.y_train)
+        t_end = time.time()
+        train_time = t_end - t_start
+        print('Training time: %f seconds' % train_time)
+        
+        # save the model to disk      
+        filename = 'tradepal/models/RandomForestClassifier_' + self.symbol+ '.sav'
+        pickle.dump(model, open(filename, 'wb'))   
+        
+        # find best fit parameters
+        best_dt_parameter = model.best_params_
+        print("Best max_depth parameter for random forest: {}".format(best_dt_parameter))
+        
+        t_start = time.time()
+        y_pred = model.predict(self.X_test)
+        t_end = time.time()
+        predict_time = t_end - t_start
+        print('Prediction time: %f seconds' % predict_time)    
+        
+        #calculate accuracy
+        correct_idx=np.where(self.y_test-y_pred==0)[0]
+        accuracy=correct_idx.shape[0]/y_pred.shape[0]#0.57
+        print('prediction accuracy is: %f' % accuracy)
+         #0.7505 for 1% 2-day return with random over-sampling
+        return accuracy,train_time
+
+
+        # ---------------------- 3: Boosting -----------------------
+    def adaBst(self):
+#        base = DecisionTreeClassifier(max_depth=10)
+        param_grid = {"base_estimator__criterion" : ["gini", "entropy"],
+              "base_estimator__splitter" :   ["best", "random"]
+             }        
+        DTC = DecisionTreeClassifier(random_state = 1, max_features = "auto", class_weight = "balanced",max_depth=10)        
+        base = AdaBoostClassifier(base_estimator = DTC)        
+        # run grid search
+        model = GridSearchCV(base, param_grid=param_grid, scoring = 'balanced_accuracy')#accuracy
+        
+#        model = AdaBoostClassifier(base_estimator=base, n_estimators=200, random_state=1)
+        
+        # train
+        t_start = time.time()
+        model = model.fit(self.X_train, self.y_train)
+        #model = model.fit(X_train, y_train)
+        t_end = time.time()
+        train_time = t_end - t_start
+        print('Training time: %f seconds' % train_time)        
+        
+        filename = 'tradepal/models/AdaBoostClassifier_' + self.symbol+ '.sav'
+        pickle.dump(model, open(filename, 'wb'))
+        
+        # predict
+        t_start = time.time()
+        y_pred = model.predict(self.X_test)
+        #y_pred = model.predict(X_test)
+        t_end = time.time()
+        predict_time = t_end - t_start
+        print('Prediction time: %f seconds' % predict_time)
+        
+        #calculate accuracy
+        correct_idx=np.where(self.y_test-y_pred==0)[0]
+#        correct_idx=np.where(y_test-y_pred==0)[0]
+        accuracy=correct_idx.shape[0]/y_pred.shape[0]#0.57
+        print('prediction accuracy is: %f' % accuracy)#0.76 for 1.5%
+        #0.9417 for 1% 2-day return with random over-sampling
+        return accuracy,train_time  #0.563		  	 		  		  		    	 		 		   		 		  
+  		   	  			  	 		  		  		    	 		 		   		 		  
+
+
+# ---------------------- 4: Support Vector Machine, Y need to be classifier -----------------------
+    def SVM_model(self):
+         # hyperparameter tuning
+        Cs = [0.001, 0.01, 0.1, 1, 10]
+        gammas = [0.001, 0.01, 0.1, 1]
+        param_grid = {'C': Cs, 'gamma' : gammas}
+        model = GridSearchCV(svm.SVC(kernel='rbf'), param_grid, scoring = 'balanced_accuracy',cv=5)       
+        
+        # training
+        t_start = time.time()
+        model.fit(self.X_train, self.y_train)
+        t_end = time.time()
+        train_time = t_end - t_start
+        print('Training time: %f seconds' % train_time)        
+        
+        filename = 'tradepal/models/SVM_' + self.symbol+ '.sav'
+        pickle.dump(model, open(filename, 'wb'))
+        
+        # find best fit parameters
+        best_parameter = model.best_params_
+        print("Best size parameter for SVM: {}".format(best_parameter))
+        
+        # predict
+        t_start = time.time()
+        y_pred = model.predict(self.X_test)
+        t_end = time.time()
+        predict_time = t_end - t_start
+        print('Prediction time: %f seconds' % predict_time)
+        
+        #calculate accuracy
+        correct_idx=np.where(self.y_test-y_pred==0)[0]
+        accuracy=correct_idx.shape[0]/y_pred.shape[0]#0.57
+        print('prediction accuracy is: %f' % accuracy)
+        return accuracy,train_time#0.58 for 1%, 0.76 for 1.5% 3-day return 
+        #0.7245 for 1% 2-day return with random over-sampling
+
+if __name__=="__main__":  	
+    symbols = ["SPY","DIA","QQQ","TLT","IWM"]
+    mods = ['LogisticRegression','RandomForestClassifier','AdaBoostClassifier','SVM']
+    #mod_accuracy save accuracy for each fund and each ML method, similar for train_time
+    mod_accuracy = pd.DataFrame(columns=mods,data=None,index=symbols)
+    train_time = pd.DataFrame(columns=mods,data=None,index=symbols)
+    for symbol in symbols:
+    #datetime(1993,1,29) is the earliest start date for the 5 funds, it does not matter if 
+    #a fund's start date is later, because missing dates will be omited  
+        model=models(symbol = symbol, sd=dt.datetime(1993,1,29), ed=dt.datetime(2020,8,31), impact=0.0) 
+        mod_accuracy.loc[symbol,'LogisticRegression'],train_time.loc[symbol,'LogisticRegression']=model.logReg()
+        mod_accuracy.loc[symbol,'RandomForestClassifier'],train_time.loc[symbol,'RandomForestClassifier']=model.randForest()
+        mod_accuracy.loc[symbol,'AdaBoostClassifier'],train_time.loc[symbol,'AdaBoostClassifier']=model.adaBst()
+        mod_accuracy.loc[symbol,'SVM'],train_time.loc[symbol,'SVM']=model.SVM_model()
+        print('Finished saving model for '+ symbol+' at '+str(dt.datetime.now()))
+        
+    mod_accuracy.to_csv('tradepal/models/LR_RF_AB_SVM_accuracy.csv', sep=',')
+    train_time.to_csv('tradepal/models/LR_RF_AB_SVM_train_time.csv', sep=',')
+
