@@ -14,30 +14,22 @@ from PIL import Image
 
 import datetime as dt
 import pandas as pd
-#from tradinghelper.util import get_data
 import numpy as np
 # import ManualStrategy as ms 
 #import StrategyLearner as sl
 #from marketsimcode import compute_portvals,compute_port_stats
 import matplotlib.pyplot as plt
+#import seaborn as sns
+#import calmap        
 #from indicators import normalize_prices
-from tradepal.models.recommend import recommend,recommend_all_2
-from indicators import get_XY_data
+from tradepal.models.recommend import recommend #recommend_today
+from tradepal.indicators import get_XY_data
 import yfinance as yf
 from datetime import timedelta
-# from ut import get_data
-# from indicators import normalize_prices
-
-import pickle
-
 
 
 # Start execution
 def main():
-    # Download data from GCP bucket
-    # download_data()
-    # # Initialise the data module for the app
-    # data_module = init_data()
     # Determine app mode to run
     # Render mardown text    
     app_mode = st.sidebar.selectbox("Choose the app mode",
@@ -52,15 +44,14 @@ def main():
     #     run_model_analysis()
 
 def welcome():
-    f = open("tradinghelper/resources/intro.md", 'r')
+    f = open("tradepal/resources/intro.md", 'r')
     st.markdown(f.read())
     f.close()
-    st.image(load_image('tradinghelper/resources/charging-bull.jpg'), use_column_width=True)
+    st.image(load_image('tradepal/resources/charging-bull.jpg'), use_column_width=True)
     "Charging Bull at the Wall Street"
 
 # Main app
-def run_app():    
-    
+def run_app():   
     # Filters
     # Select model to use
     
@@ -79,10 +70,7 @@ def run_app():
     model_name= st.sidebar.selectbox("Select Model",("Logistic Regression",
                                                          "Random Forest","Ada Boosting", 
                                                          "Support Vector Machine",
-                                                         "Deep Neural Network","Long Short-Term Memory"))
-    
-#    models = ['LogisticRegression','RandomForestClassifier','AdaBoostClassifier',
-#              'SVM','DNN','lstm']
+                                                         "Long Short-Term Memory"))
    
     # prices=np.array([price1, price2,price3,price4,price5,price6,price7])    
     # input_df=pd.DataFrame(index=np.arange(1,8), columns=['Price'])
@@ -109,20 +97,20 @@ def run_app():
         mod='DNN'
     elif model_name=="Long Short-Term Memory":
         mod='lstm'
-        
-    print(dt.datetime.now())
-    recommendation, results=recommend_all_2()
-    print(dt.datetime.now())
+
+#    recommendation, results, query=recommend_today()   
+    query=pd.read_csv('tradepal/models/query.csv', sep=',', index_col=0,delimiter=None, header='infer')
+
    
     
     
     result=""
-    if results.loc[symbol,mod].values==0:
-        result='Buying'
-    elif results.loc[symbol,mod].values==2:
-        result='Selling'
+    if query.loc[symbol,mod]==0:
+        result='BUY'
+    elif query.loc[symbol,mod]==2:
+        result='SELL'
     else:
-        result='Holding'
+        result='HOLD'
         
     "   "
     "   "
@@ -132,29 +120,37 @@ def run_app():
         # result=predict_note_authentication(variance,skewness,curtosis,entropy)
         # result
         # st.success('The output is: {}'.format(result))
-        st.success(f'The predicted trading for tomorrow is:  {result}')
+        st.success(f'### The predicted trading for today is:  {result}')
         # st.write(f"classifier={classifier_name}")
-    
-    final=recommendation[symbol,'trade']
+    "   "
+    "   "
+    final=query.loc[symbol,'recommend']
     if st.sidebar.checkbox('Show recommendation'):
-        st.success(f'The recommended trading for tomorrow is:  {final}')
-        
-        #also present the price of last 30 days, reference trading option, the performance of each ML method
+        st.success(f'### The recommended trading for today is:  {final}')
         
         
-        
-        
-#        chart_data = pd.DataFrame(
-#           np.random.randn(20, 3),
-#           columns=['a', 'b', 'c'])    
-#        st.line_chart(chart_data)
+    if st.sidebar.checkbox('Show backtesting results of all models'):
+        st.write("### Backtesting results for the past 3 years is shown below (each year has 252 transaction days), where green color and red color represent right and wrong predictions, respectively.")
+        image_name='tradepal/resources/back_test_model_performance_'+symbol+'.png'
+        st.image(load_image(image_name), use_column_width=True)
+        "   "
+        "   "
+        st.write("### Backtesting accuracy of all models for index fund "+ symbol+" in the past 3 years is shown below:")
+        ##show picture of model performance here
+        image_name='tradepal/resources/back_test_performance_barchart_'+symbol+'.png'
+        st.image(load_image(image_name), use_column_width=True)
     
 # Data Analysis app
 def run_data_analysis(): 
     # df = data_module.data
     
-    st.title('SPY Index Fund Data Analysis')
-    st.write('One this page we explore the SPY fund index stock data in 2011.')
+    st.title('Index Fund Data Analysis')
+    
+    st.write("### Historical normalized prices variations for the 5 representative index funds is shown below:")
+    st.image(load_image('tradepal/resources/price_variations.png'), use_column_width=True)
+    
+    "   "
+    st.write('### Below we explore the SPY fund index stock data in 2011.')
     
     symbol='SPY'		
 #    sd=dt.datetime(2010,1,1)
@@ -173,10 +169,12 @@ def run_data_analysis():
     
     # Dataframe samples
     st.subheader("Sample of raw dataset")
-    raw=pd.read_csv("tradinghelper/data/SPY.csv")     
+    raw=pd.read_csv("tradepal/data/SPY.csv")     
     st.write(raw.iloc[176:185,])
     st.subheader("Features used in training")
-    st.table(df_dataX[30:35])
+    st.dataframe(df_dataX[30:35])
+    st.write("Note: SMA=simple moving average, BB_pct= Bollinger Band percent, CCI=Commodity Channel Index, OBV=On-Balance Volume, macd=moving average convergence divergence, rsi_12=Relative strength index (window is 12), kdjj=stochastic oscillator, adx=Average directional index   ")
+#    st.table(df_dataX[30:35])
     # Description length histogram
     st.subheader("Trading performance of different methods measured by normalized market value")
     # hist_values = np.histogram(
@@ -184,11 +182,11 @@ def run_data_analysis():
     # st.bar_chart(hist_values)
     
     "During model training period for the SPY fund index, the performance of random forest is much better than those of manual strategy (based on certain trading rules) and benchmark (no trading)"
-    st.image(load_image('tradinghelper/resources/SPY_traing.png'), use_column_width=True)
+    st.image(load_image('tradepal/resources/SPY_training.png'), use_column_width=True)
     
     "Similarly, during model testing period for the SPY fund index, the performance of random forest is also much better than manual strategy and benchmark."
   
-    st.image(load_image('tradinghelper/resources/SPY_testing.png'), use_column_width=True)
+    st.image(load_image('tradepal/resources/SPY_testing.png'), use_column_width=True)
 
 
 

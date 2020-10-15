@@ -39,11 +39,11 @@ from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import StandardScaler,OneHotEncoder, LabelEncoder
 from sklearn.model_selection import train_test_split
 from tradepal.util import calculate_aic, r2, split_sequence
-from indicators import get_XY_data
+from tradepal.indicators import get_XY_data
 
 
 def lstm(lstm_params,symbol = "SPY", sd=dt.datetime(1993,1,29), ed=dt.datetime(2020,8,31), impact=0.0):
-    df_dataX, df_dataY, df_indicators=get_XY_data(symbol, sd, ed, impact)
+    df_dataX, df_dataY, df_indicators=get_XY_data(symbol, sd, ed, impact,recent_flag=False)
         
     # creating instance of labelencoder
     labelencoder = LabelEncoder()
