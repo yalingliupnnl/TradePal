@@ -8,9 +8,9 @@ As we all know, the stock market is very risky, at the same time the professiona
 
 ## Structure of this repository
 All the data, sources codes and related resources are saved in the directory `tradpal`, and the contents of each subdirectory are described below:
-`data`
-`models`
-`resources`
+`data` all the related source data (e.g., historical stock prices, historical US dollar LIBOR interest rates) reside here.
+`models` all the source codes for the 5 machine learning models, and the trained models and associated parameters reside here.
+`resources` all supporting images and auxillary resources for the app reside here.
 
 
 

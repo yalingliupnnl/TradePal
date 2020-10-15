@@ -1,6 +1,0 @@
-,LogisticRegression,RandomForestClassifier,AdaBoostClassifier,SVM,lstm,recommend
-SPY,1,1,1,1,1,HOLD
-DIA,1,1,1,1,1,HOLD
-QQQ,1,1,1,1,1,HOLD
-TLT,1,1,1,1,1,HOLD
-IWM,1,1,1,1,1,HOLD

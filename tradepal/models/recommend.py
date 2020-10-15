@@ -17,7 +17,6 @@ from tradepal.util import genearte_input_sequence
 from tradepal.indicators import get_XY_data
 from sklearn.preprocessing import LabelEncoder
 import matplotlib.pyplot as plt
-#from tradepal.models import logReg,randForest,adaBst,SVM_model
 
 def recommend(symbol,mod):
     # load the model from disk
@@ -45,16 +44,6 @@ def recommend(symbol,mod):
         filename=glob.glob('tradepal/models/ANN_best_para.csv')
         best_para=pd.read_csv(filename[0], sep=',', index_col=1,delimiter=None, header='infer') 
         best_lr=best_para.loc[symbol,'ln_rate']
-#        if symbol=="SPY":
-#            best_lr=best_para.loc[0,'ln_rate']
-#        elif symbol=="DIA":
-#            best_lr=best_para.loc[1,'ln_rate']
-#        elif symbol=="QQQ":
-#            best_lr=best_para.loc[2,'ln_rate']
-#        elif symbol=="TLT":
-#            best_lr=best_para.loc[3,'ln_rate']
-#        elif symbol=="IWM":
-#            best_lr=best_para.loc[4,'ln_rate']
         
         model.compile(optimizer= Adam(lr=best_lr), loss= 'categorical_crossentropy', metrics=['acc'])       
         
@@ -92,8 +81,7 @@ def recommend(symbol,mod):
         # split test set into samples
         X_ts=genearte_input_sequence(X_past, best_lookback)
         y_today = model.predict(X_ts, verbose=0)[-1][0].astype(int)
-#                y_ts = y_ts[:,-1:]
-#                X_ts=X_ts[:,:,:-1]
+
     
     if mod not in ['DNN','lstm']:            
         y_option=y_today[0].astype(int) 
@@ -119,7 +107,7 @@ def recommend_all():
     
     for symbol in symbols:
         #get X_past input
-        df_dataX, df_dataY, df_indicators=get_XY_data(symbol, sd=dt.datetime(2020,9,1), 
+        df_dataX, df_dataY, df_indicators=get_XY_data(symbol, sd=dt.datetime.now().date()-dt.timedelta(1115), 
                                                   ed=dt.datetime.now().date(),impact=0.0,recent_flag=True)#
         
         #prediction results for the the past 22 transaction days, the prediction on 10/1 corresponds
@@ -134,7 +122,6 @@ def recommend_all():
         #e.g., for day 1-24, features of day 22 is used to predict optimal trading on day 23 (Y-label),
         # which is determined by price on day 24, so day 23 and 24 are omited in Y label.
         idx1=y_true.index.get_loc(df_indicators.index[-(nn+2)].date().isoformat())
-#        idx2=y_true.index.get_loc(results_past.index[-1].isoformat())
         
         results_past['y_true']=y_true[idx1:].values.reshape(nn,1)
         for mod in models:
@@ -144,7 +131,7 @@ def recommend_all():
             if mod!='lstm':
 #                idx=df_indicators.index.get_loc((dt.datetime.now().date()-dt.timedelta(30)).isoformat())
                 X_past=df_indicators.iloc[-(nn+2):-2,:].values
-#                X_past=X_past.reshape(1,(len(X_past)))
+
             else:
                 filename=glob.glob('tradepal/models/lstm_best_para.csv')
                 best_para=pd.read_csv(filename[0], sep=',', index_col=1,delimiter=None, header='infer')                 
@@ -161,12 +148,12 @@ def recommend_all():
                 y_past = model.predict(X_ts, verbose=0).astype(int)
 
             y_option=np.zeros((len(y_past),1)).astype(int)
-            if mod not in ['DNN','lstm']:   
+            if mod not in ['lstm']:   
                 for i in np.arange(len(y_past)):
                     y_option[i]=y_past[i].astype(int) 
-            elif mod =='DNN':
-                for i in np.arange(len(y_past)):
-                    y_option[i]=np.argmax(y_past[i])
+#            elif mod =='DNN':
+#                for i in np.arange(len(y_past)):
+#                    y_option[i]=np.argmax(y_past[i])
             elif mod=='lstm':
                 y_option=y_past
             
@@ -190,11 +177,9 @@ def recommend_all():
         # Add colorbar, make sure to specify tick locations to match desired ticklabels
         cbar = fig.colorbar(cax, ticks=[-1, 0, 1])
         cbar.ax.set_yticklabels(['-1', '0', '1'], fontsize=16)  # vertically oriented colorbar
-#        plt.matshow(perform.T, interpolation=None, aspect='auto', cmap='RdYlGn')        
-#        ax.set_xticks([100,200,300,400,500,600,700])
         ax.set_xticks([55,180,306,431,558,684])
+        
         # ... and label them with the respective list entries
-#        ax.set_xticklabels(['100','200','300','400','500','600','700'], fontsize=16)
         ax.set_xticklabels(['1/2/18','7/2/18','1/2/19','7/2/19','1/2/20','7/2/20'], fontsize=16)
         ax.set_yticklabels(['']+names, fontsize=16)
         ax.xaxis.set_tick_params(width=5)
@@ -241,8 +226,6 @@ def recommend_all():
     query.to_csv('tradepal/models/query.csv', sep=',')
     return recommendation, results, query
 
-
-            
 
 if __name__ == "__main__":
     recommend_all()

@@ -58,15 +58,13 @@ def compute_indicators(symbol, sd=dt.datetime(2008,1,1),ed=dt.datetime(2009,12,3
         yfdata = yf.download(symbol, start=dt.datetime.now().date()-dt.timedelta(1115), 
                              end=dt.datetime.now().date(), progress=False)        
         Adj_close_price=pd.DataFrame(index=yfdata.index,columns=[symbol],data=yfdata['Adj Close'].values) 
-        
-#        yfdata2=pd.DataFrame(index=np.arange(len(yfdata.index)),columns=yfdata.columns,data=yfdata.values) 
+         
         yfdata.reset_index(inplace=True)
         stock = stockstats.StockDataFrame.retype(yfdata) 
         OBV_df=OBV(symbol, sd,ed,recent_flag=True)
-#        prices=pd.DataFrame(index=yfdata.index,columns=[symbol],data=yfdata['Adj Close'].values)     
+    
 
     stock2=stock[['close_3_trix','macd','rsi_12','rsi_6','kdjj','adx','cr-ma1','cr-ma2']]
-#    copy.deepcopy()
     
 #    df = df.join(df_temp)  		   	  			  	 		  		  		    	 		 		   		 		  
 #    stock['macd']	#Moving average convergence divergence 	   	
@@ -171,9 +169,7 @@ def get_XY_data(symbol = "SPY", sd=dt.datetime(2008,1,1), ed=dt.datetime(2009,12
     
     #join with indicators
     libor2=indicators.join(libor)  		
-    fill_missing(libor2)	
-#    fill_missing(treasury)	
-#    libor2=libor2.join(treasury)	
+    fill_missing(libor2)		
 		
     indicators=libor2.join(treasury)
     fill_missing(indicators)
@@ -228,7 +224,7 @@ def plot_price():
 def test_code():
     start_date=dt.datetime(2008,1,1)
     end_date=dt.datetime(2009,12,31)
-    symbol='JPM'
+    symbol='SPY'
     #SMA
     ax=(compute_indicators(symbol,start_date,end_date)[['price','SMA']].plot
         (title='Simple Moving Average (SMA)',figsize=(20,10), fontsize=12))	  		    	 		 		   		 		  

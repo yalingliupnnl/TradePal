@@ -7,7 +7,6 @@ Created on Fri Sep 25 13:12:16 2020
 """
 
 
-import os
 import pandas as pd
 import numpy as np
 import datetime as dt 
@@ -28,20 +27,11 @@ from sklearn.metrics import accuracy_score,f1_score
 from imblearn.over_sampling import SVMSMOTE, SMOTE
 from imblearn.under_sampling import RandomUnderSampler
 from collections import Counter
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import RepeatedStratifiedKFold
-from imblearn.pipeline import Pipeline
-from numpy import mean
+#from sklearn.model_selection import cross_val_score
+#from sklearn.model_selection import RepeatedStratifiedKFold
+#from imblearn.pipeline import Pipeline
 
- 		   	  			  	 		  		  		    	 		 		   		 		  
-# from tradinghelper import util as ut 		   	  			  	 		  		  		    	 		 		   		 		  
-import random  		 
-# import RTLearner as rt	
-# import BagLearner as bl
-# import matplotlib.pyplot as plt
-# from indicators import compute_indicators, normalize_prices#, compute_input_df_indicators
-# from marketsimcode import compute_portvals,compute_port_stats
-# from ManualStrategy import testPolicy
+
  	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
 class models(object):  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -51,7 +41,6 @@ class models(object):
         self.symbol = symbol
         self.impact = impact 
         
-        ###----------------------------------YALING, START FROM HERE!!!!!!!!!----------------------------------
         df_dataX, df_dataY, df_indicators=get_XY_data(symbol = symbol, sd=dt.datetime(1993,1,29), 
                                                       ed=dt.datetime(2020,8,31), impact=0.0, recent_flag=False)
         
@@ -59,18 +48,13 @@ class models(object):
         labelencoder = LabelEncoder()
         df_dataY['encode']=labelencoder.fit_transform(df_dataY['dataY'])
         
-        #one hot encoder for the trading options of buy, hold and sell
-        # enc = OneHotEncoder(handle_unknown='ignore')
-        # enc_df = pd.DataFrame(enc.fit_transform(df_dataY[['encode']]).toarray())
-        # inv_df=enc.inverse_transform(enc_df)
         
         X = df_dataX.values
         # y = enc_df.values
         y=df_dataY['encode'].values
 #        len(np.where(y==1)[0])/y.shape[0]#HOLD, 0.737 for SPY, 0.924 for TLT, 0.88 DIA
 #        len(np.where(y==0)[0])/y.shape[0]#BUY, 0.138 for SPY,  0.037 for TLT,0.061 DIA
-#        len(np.where(y==2)[0])/y.shape[0]#SELL, 0.125 for SPY, 0.038 for TLT, 0.579 DIA
-        
+#        len(np.where(y==2)[0])/y.shape[0]#SELL, 0.125 for SPY, 0.038 for TLT, 0.579 DIA      
        
         
         # split dataset into training and test set
@@ -79,13 +63,7 @@ class models(object):
          ####Random Over-Sampling to combat imbalanced classes, with random replicas
         idx_hold=np.where(y_train==1)[0]
         idx_buy=np.where(y_train==0)[0]
-        idx_sell=np.where(y_train==2)[0]        
-#        dataXY=np.column_stack((X_train,y_train))        
-#        buy_replica = np.tile(dataXY[idx_buy], (3, 1))
-#        sell_replica = np.tile(dataXY[idx_sell], (3, 1))        
-#        dataXY=np.row_stack((dataXY,buy_replica,sell_replica))        
-#        X_train=dataXY[:,:-1]
-#        y_train=dataXY[:,-1]        
+        idx_sell=np.where(y_train==2)[0]              
         
         #get features and labels for each class
         sell_features=X_train[idx_sell]
@@ -109,11 +87,6 @@ class models(object):
         ##combine the replicas of minority class with the majority class
         resampled_features = np.concatenate([res_sell_features, res_buy_features, hold_features], axis=0)
         resampled_labels = np.concatenate([res_sell_labels, res_buy_labels,hold_labels], axis=0)
-#        #shuffle the order
-#        order = np.arange(len(resampled_labels))
-#        np.random.shuffle(order)
-#        resampled_features = resampled_features[order]
-#        resampled_labels = resampled_labels[order]
         
         resampled_features.shape
         #re-assign training data
@@ -129,47 +102,6 @@ class models(object):
         undersample = RandomUnderSampler(sampling_strategy='majority', random_state=1)#majority
         # fit and apply the transform
         X_train, y_train = undersample.fit_resample(X_train, y_train)
-        
-        
-        
-#        ####SMOTE performs better when combined with undersampling of the majority class, 
-#        #e.g.,random undersampling. but seems undersampling does not work here for multi-class
-#        # summarize class distribution
-#        counter = Counter(y_train)
-#        print(counter)        
-#        over = SMOTE()
-#        under = RandomUnderSampler(sampling_strategy='majority', random_state=1)
-#        steps = [('over', over), ('under', under)]
-#        pipeline = Pipeline(steps=steps)
-#        # transform the dataset
-#        X_train, y_train = pipeline.fit_resample(X_train, y_train)
-#        # summarize the new class distribution
-#        counter = Counter(y_train)
-#        print(counter)  
-       
-        
-        
-#        ####borderline-SMOTE with SVM for imbalanced dataset, SMOTE is only applied to the training set 
-#        #https://machinelearningmastery.com/smote-oversampling-for-imbalanced-classification/
-#        # summarize class distribution
-#        counter = Counter(y_train)
-#        print(counter)
-#        
-#        over = SVMSMOTE()
-#        under = RandomUnderSampler(sampling_strategy='majority', random_state=1)
-#        steps = [('over', over), ('under', under)]
-#        pipeline = Pipeline(steps=steps)
-#        # transform the dataset
-#        X_train, y_train = pipeline.fit_resample(X_train, y_train)
-#        
-#        # transform the dataset
-##        oversample = SVMSMOTE()
-##        X_train, y_train = oversample.fit_resample(X_train, y_train)
-#        # summarize the new class distribution
-#        counter = Counter(y_train)
-#        print(counter)
-#        #0.494 backtest accuracy, even worse than random over-sampling
-        
         
         #shuffle the order
         order = np.arange(len(X_train))
@@ -244,10 +176,6 @@ class models(object):
         predict_time = t_end - t_start
         print('Prediction time: %f seconds' % predict_time)
         
-        # evaluation
-        # print("MSLE: {:.3f}".format(metrics.mean_squared_log_error(y_test, y_pred)))#0.179
-        # score = model.score(X_test, y_test)
-        # print(score) #0.54
         
         #calculate accuracy
         correct_idx=np.where(self.y_test-y_pred==0)[0]
@@ -397,9 +325,9 @@ if __name__=="__main__":
     #datetime(1993,1,29) is the earliest start date for the 5 funds, it does not matter if 
     #a fund's start date is later, because missing dates will be omited  
         model=models(symbol = symbol, sd=dt.datetime(1993,1,29), ed=dt.datetime(2020,8,31), impact=0.0) 
-#        mod_accuracy.loc[symbol,'LogisticRegression'],train_time.loc[symbol,'LogisticRegression']=model.logReg()
-#        mod_accuracy.loc[symbol,'RandomForestClassifier'],train_time.loc[symbol,'RandomForestClassifier']=model.randForest()
-#        mod_accuracy.loc[symbol,'AdaBoostClassifier'],train_time.loc[symbol,'AdaBoostClassifier']=model.adaBst()
+        mod_accuracy.loc[symbol,'LogisticRegression'],train_time.loc[symbol,'LogisticRegression']=model.logReg()
+        mod_accuracy.loc[symbol,'RandomForestClassifier'],train_time.loc[symbol,'RandomForestClassifier']=model.randForest()
+        mod_accuracy.loc[symbol,'AdaBoostClassifier'],train_time.loc[symbol,'AdaBoostClassifier']=model.adaBst()
         mod_accuracy.loc[symbol,'SVM'],train_time.loc[symbol,'SVM']=model.SVM_model()
         print('Finished saving model for '+ symbol+' at '+str(dt.datetime.now()))
         
