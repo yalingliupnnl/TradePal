@@ -1,16 +1,18 @@
 # TradePal
-A Free, Transparent and Efficient Stock Trading Assistant Powered by Machine Learning
+#### A Free, Transparent and Efficient Stock Trading Assistant Powered by Machine Learning
 
 ## Motivation for this project:
 As we all know, the stock market is very risky, at the same time the professional wealth management services are pricey, thus regular non-professional stockholders face great risks in stock trading. This project addresses this headache by providing a free, transparent and efficient web app powered by machine learning to help non-professionals on stock trading, by providing the predictions of today's optial trading option (Buy, Sell or Hold) as well as final recommendation. In addition, the app provides backtesting results in the past 3 years from all the 5 machine learning models such that the user can make their own trading decision based on those results. 
 
+The figure below presents a bried demo of the TradePal web app.
+
 ![](app_demo.gif)
 
 ## Structure of this repository
-All the data, sources codes and related resources are saved in the directory `tradpal`, and the contents of each subdirectory are described below:
-`data`
-`models`
-`resources`
+All the data, sources codes and related resources are included in the directory `tradpal`, and the contents of each subdirectory are described below:<br />
+`data` all the related source data (e.g., historical stock prices, historical US dollar LIBOR interest rates) reside here.  <br />
+`models` all the source codes for the 5 machine learning models, and the trained models and associated parameters reside here. <br />
+`resources` all supporting images and auxillary resources for the app reside here.  <br />
 
 
 
@@ -119,7 +121,7 @@ gcloud container clusters delete cloudwine-cluster
 
 
 ## Data Exploration
-Run the streamlit app and see the 'Data Exploration' page for data exploration and experiment results.
+Run the streamlit app and see the 'Data Exploration' page for data exploration and experiment results. Below is an example of the performance comparison between Random Forest and the Benchmark strategy (buy and hold) for SPY (SP 500 index fund). 
 
 ![](tradepal/resources/SPY_training.png?raw=true)
 
