@@ -11,7 +11,7 @@ The figure below presents a bried demo of the TradePal web app.
 ## Structure of this repository
 All the data, sources codes and related resources are included in the directory `tradpal`, and the contents of each subdirectory are described below.<br />
 `1) data:` all the related source data (e.g., historical stock prices, historical US dollar LIBOR interest rates) reside here.  <br /><br />
-`2) models:` all the source codes for the 5 machine learning models, and the well-trained models and associated parameters reside here. The source codes for the lstm model are in the file `lstm.py` and lstm is trained separately using `lstm_grid_search.py` to seek the best hyperparameters. Source codes for all 4 other models reside in the `models.py` file. The file `recommend.py` is used to provides the fund- and model-specific prediction for today's trading option and the app's final recommendation as well.<br /><br />
+`2) models:` all the source codes for the 5 machine learning models, and the well-trained models and associated parameters reside here. The source codes for the lstm model are in the file `lstm.py` and lstm is trained separately using `lstm_grid_search.py` to seek the best hyperparameters. Source codes for all 4 other models reside in the `models.py` file, which is rendered in object oriented programming (OOP). The file `recommend.py` is used to provides the fund- and model-specific prediction for today's trading option and the app's final recommendation as well.<br /><br />
 `3) resources:` all supporting images and auxillary resources for the app reside here.  <br /><br />
 
 
