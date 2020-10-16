@@ -6,7 +6,6 @@ Created on Tue Sep 22 10:57:10 2020
 @author: yalingliu
 """
 
-#!/usr/bin/env python
 import streamlit as st
 import pandas as pd
 import numpy as np

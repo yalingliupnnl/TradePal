@@ -9,30 +9,28 @@ Created on Fri Sep 25 13:12:16 2020
 import pandas as pd
 import numpy as np
 import datetime as dt 
-import matplotlib.pyplot as plt
 import pickle
 import time
 from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import StandardScaler,OneHotEncoder, LabelEncoder
+from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier,RandomForestClassifier
 from sklearn.model_selection import train_test_split, GridSearchCV,RandomizedSearchCV
 from sklearn import svm
-from sklearn.metrics import accuracy_score,f1_score
+from sklearn.metrics import accuracy_score
 from xgboost import XGBClassifier
-#from imblearn.over_sampling import SVMSMOTE, SMOTE
+from imblearn.over_sampling import SVMSMOTE, SMOTE
 from imblearn.under_sampling import RandomUnderSampler
 from collections import Counter
 import glob
-from tensorflow.keras.layers import LSTM, Dense, LeakyReLU, Dropout, Masking,Input, Activation#.python
-from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras.layers import LSTM, Dense, LeakyReLU, Dropout, Masking,Input
+from tensorflow.keras.models import Sequential
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
 from tradepal.src.util import split_sequence
 from tradepal.src.indicators import get_XY_data	  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
-class models(object):  		
-   	  			  	 		  		  		    	 		 		   		 		  		   	  			  	 		  		  		    	 		 		   		 		  
+class models(object):		  		  		    	 		 		   		 		  		   	  			  	 		  		  		    	 		 		   		 		  
     def __init__(self, symbol = "SPY", sd=dt.datetime(1993,1,29), ed=dt.datetime(2020,8,31), impact=0.0):  
         self.symbol = symbol
         self.impact = impact 
@@ -103,7 +101,9 @@ class models(object):
         
     def author(self):  		   	  			  	 		  		  		    	 		 		   		 		  
         return 'Yaling Liu'  
-        
+    
+    
+    #---------------- 0: XGBoost ---------------------        
     def XGBoost(self):        
         base = XGBClassifier(n_estimators=200)
         max_depth_range=np.arange(10) + 1
@@ -123,7 +123,7 @@ class models(object):
         y_pred = model.predict(self.X_test)
         predictions = [round(value) for value in y_pred]
         accuracy = accuracy_score(self.y_test, predictions)
-        print("Accuracy: %.2f%%" % (accuracy * 100.0))#0.877 for random over-sampling
+        print("Accuracy: %.2f%%" % (accuracy * 100.0))
         
 
     #---------------- 1: logistic regression ---------------------
@@ -149,7 +149,7 @@ class models(object):
         
         #calculate accuracy
         correct_idx=np.where(self.y_test-y_pred==0)[0]
-        accuracy=correct_idx.shape[0]/y_pred.shape[0]#0.57
+        accuracy=correct_idx.shape[0]/y_pred.shape[0]
         print('prediction accuracy is: %f' % accuracy)
         
         return accuracy,train_time
@@ -197,7 +197,7 @@ class models(object):
         DTC = DecisionTreeClassifier(random_state = 1, max_features = "auto", class_weight = "balanced",max_depth=10)        
         base = AdaBoostClassifier(base_estimator = DTC)        
         # run grid search
-        model = GridSearchCV(base, param_grid=param_grid, scoring = 'f1_weighted')#balanced_accuracy
+        model = GridSearchCV(base, param_grid=param_grid, scoring = 'f1_weighted')
         
         
         # train
@@ -219,9 +219,9 @@ class models(object):
         
         #calculate accuracy
         correct_idx=np.where(self.y_test-y_pred==0)[0]
-        accuracy=correct_idx.shape[0]/y_pred.shape[0]#0.57
-        print('prediction accuracy is: %f' % accuracy)#0.76 for 1.5%
-        return accuracy,train_time  #0.563		  	 		  		  		    	 		 		   		 		  
+        accuracy=correct_idx.shape[0]/y_pred.shape[0]
+        print('prediction accuracy is: %f' % accuracy)
+        return accuracy,train_time  	  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
 
 
@@ -256,7 +256,7 @@ class models(object):
         
         #calculate accuracy
         correct_idx=np.where(self.y_test-y_pred==0)[0]
-        accuracy=correct_idx.shape[0]/y_pred.shape[0]#0.57
+        accuracy=correct_idx.shape[0]/y_pred.shape[0]
         print('prediction accuracy is: %f' % accuracy)
         return accuracy,train_time       
     
@@ -365,8 +365,8 @@ if __name__=="__main__":
         lstm_params = {
                     'lookback':best_para.loc[symbol,'lookback'].astype(int),
                    'n_units':best_para.loc[symbol,'n_units'].astype(int),
-                   'batch_size': best_para.loc[symbol,'batch_size'].astype(int),#4500
-                   'ln_rate' : best_para.loc[symbol,'ln_rate']} #0.05
+                   'batch_size': best_para.loc[symbol,'batch_size'].astype(int),
+                   'ln_rate' : best_para.loc[symbol,'ln_rate']} 
         
         #different index funds have different start date
         if symbol=='SPY':

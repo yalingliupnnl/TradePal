@@ -21,25 +21,26 @@ if __name__ == "__main__":
     params = pd.DataFrame(columns=['symbol',
                                    'lookback',
                                    'n_units',
-                                   'batch_size',#4500
+                                   'batch_size',
                                    'ln_rate',
                                    'train_loss',
-                                  'val_loss',
-                                  'train_acc',
-                                  'val_acc',   
-                                  'test_acc'],data=None)
+                                   'val_loss',
+                                   'train_acc',
+                                   'val_acc',   
+                                   'test_acc'],data=None)
    
     for symbol in symbols:
         print(dt.datetime.now())
         log = pd.DataFrame(columns=['lookback',
                                     'n_units',
-                                   'batch_size',#4500
-                                   'ln_rate',
-                                   'train_loss',
-                                  'val_loss',
-                                  'train_acc',
-                                  'val_acc',   
-                                  'test_acc'],data=None)
+                                    'batch_size',
+                                    'ln_rate',
+                                    'train_loss',
+                                    'val_loss',
+                                    'train_acc',
+                                    'val_acc',   
+                                    'test_acc'],data=None)
+    
         #different index funds have different start date
         if symbol=='SPY':
             sd=dt.datetime(1993,1,29)
@@ -59,9 +60,9 @@ if __name__ == "__main__":
                 for j in np.arange(len(batch_size)):
                     for k in np.arange(len(ln_rate)):
                         lstm_params = {'lookback': lookback[p],
-                               'n_units':n_units[i],#64
-                               'batch_size': batch_size[j],#500
-                               'ln_rate' : ln_rate[k]} #0.005
+                               'n_units':n_units[i],
+                               'batch_size': batch_size[j],
+                               'ln_rate' : ln_rate[k]} 
          
                         #run the model,iterate through the 5 index funds "SPY","DIA","QQQ","TLT","IWM"
                         ML=models(symbol = symbol, sd=sd, ed=dt.datetime(2020,8,31), impact=0.0) 

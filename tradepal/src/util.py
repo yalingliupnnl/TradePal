@@ -6,10 +6,8 @@ Created on Tue Sep 22 10:57:10 2020
 @author: yalingliu
 """	   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
-import os  		   	  	
-import numpy as np		  	 		  		  		    	 		 		   		 		  
+import os  		   	  		  	 		  		  		    	 		 		   		 		  
 import pandas as pd  		   	
-import datetime as dt 
 from math import log 			  	 		  	
 		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  

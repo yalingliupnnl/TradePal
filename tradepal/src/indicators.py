@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Sep 22 10:57:10 2020
+Created on Tue Sep 15 10:57:40 2020
 
 @author: yalingliu
 """
  			  	 		  		  		    	 		 		   		 		  
 import pandas as pd  		   	  			  	 		  		  		    	 		 		   		 		  
-import numpy as np  		
-import pandas as pd   	  			  	 		  		  		    	 		 		   		 		  
-import datetime as dt 
-from datetime import timedelta	  		  		    	 		 		   		 		  
-from tradepal.src.util import get_data, get_vol,plot_data  
+import numpy as np  		 	  			  	 		  		  		    	 		 		   		 		  
+import datetime as dt 	  		  		    	 		 		   		 		  
+from tradepal.src.util import get_data, get_vol
 import matplotlib.pyplot as plt		  
 import stockstats
 import copy
