@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 #import seaborn as sns
 #import calmap        
 #from indicators import normalize_prices
-from tradepal.models.recommend import recommend #recommend_today
+from tradepal.src.recommend import recommend #recommend_today
 from tradepal.indicators import get_XY_data
 import yfinance as yf
 from datetime import timedelta
@@ -55,10 +55,10 @@ def run_app():
     # Filters
     # Select model to use
     
-    st.title("Trading Helper")
+    st.title("TradePal")
     html_temp = """
     <div style="background-color:tomato;padding:10px">
-    <h2 style="color:white;text-align:center;">Streamlit Trading Helper App </h2>
+    <h2 style="color:white;text-align:center;">Streamlit TradePal App </h2>
     </div>
     """
     st.markdown(html_temp,unsafe_allow_html=True)    
