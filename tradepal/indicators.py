@@ -1,10 +1,16 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Sep 22 10:57:10 2020
+
+@author: yalingliu
+"""
  			  	 		  		  		    	 		 		   		 		  
 import pandas as pd  		   	  			  	 		  		  		    	 		 		   		 		  
 import numpy as np  		
 import pandas as pd   	  			  	 		  		  		    	 		 		   		 		  
 import datetime as dt 
-from datetime import timedelta 		   	  			  	 		  		  		    	 		 		   		 		  
-import os  		   	  			  	 		  		  		    	 		 		   		 		  
+from datetime import timedelta	  		  		    	 		 		   		 		  
 from tradepal.util import get_data, get_vol,plot_data  
 import matplotlib.pyplot as plt		  
 import stockstats
@@ -14,7 +20,7 @@ import logging
 
 
 def author():  		   	  			  	 		  		  		    	 		 		   		 		  
-    return 'Yaling Liu' # 
+    return 'Yaling Liu'  
 
 def OBV(symbol, sd=dt.datetime(2008,1,1),ed=dt.datetime(2009,12,31),recent_flag=False):
     pd.options.mode.chained_assignment = None    		   	  			  	 		  		  		    	 		 		   		 		  
@@ -30,12 +36,10 @@ def OBV(symbol, sd=dt.datetime(2008,1,1),ed=dt.datetime(2009,12,31),recent_flag=
         prices=pd.DataFrame(index=yfdata.index,columns=[symbol],data=yfdata['Adj Close'].values) 
         vol=pd.DataFrame(index=yfdata.index,columns=[symbol],data=yfdata['Volume'].values) 
     OBV_df = pd.DataFrame(index=prices.index,columns=['OBV'],data=0)  	
-#    obv_prev=vol[syms].iloc[0,0]
+
     close_diff=prices[1:].values-prices[:-1]#len(df.index)-1 
     i=1
-    for index, data in close_diff.iterrows():#close_diff starts from the 2nd day of dates
-#        print(index)
-#        print(data)#        
+    for index, data in close_diff.iterrows():#close_diff starts from the 2nd day of dates       
         if close_diff.loc[index,symbol]>0:
             OBV_df['OBV'].iloc[i]=OBV_df['OBV'].iloc[i-1]+vol.iloc[i,0]
         elif close_diff.loc[index,symbol]<0:
@@ -64,21 +68,15 @@ def compute_indicators(symbol, sd=dt.datetime(2008,1,1),ed=dt.datetime(2009,12,3
         OBV_df=OBV(symbol, sd,ed,recent_flag=True)
     
 
-    stock2=stock[['close_3_trix','macd','rsi_12','rsi_6','kdjj','adx','cr-ma1','cr-ma2']]
-    
-#    df = df.join(df_temp)  		   	  			  	 		  		  		    	 		 		   		 		  
+    stock2=stock[['close_3_trix','macd','rsi_12','rsi_6','kdjj','adx','cr-ma1','cr-ma2']]	   	  			  	 		  		  		    	 		 		   		 		  
 #    stock['macd']	#Moving average convergence divergence 	   	
 #    stock['rsi_12'] #Relative strength index 
 #    stock['kdjj']#Stochastic oscillator		  	
-#    stock['adx']#Average directional index (ADX) 	
-    
-#    stock['std']#MSTD: moving standard deviation	  		  		    	 		 		   		 		  
-    # read in adjusted close prcies for the symbol in the date range 
-        
+#    stock['adx']#Average directional index (ADX)
+#    stock['std']#MSTD: moving standard deviation	
     
      #normalize the prices of sybols and SPY
     prices_norm=normalize_prices(Adj_close_price[symbol])
-#    prices_SPY_norm=normalize_prices(Adj_close_price['SPY'])
     
     #create a dataframe to save the 3 indicators
     df_indicators=pd.DataFrame(index=prices_norm.index,data=None)
@@ -94,13 +92,11 @@ def compute_indicators(symbol, sd=dt.datetime(2008,1,1),ed=dt.datetime(2009,12,3
     df_indicators['BB_pct']=(prices_norm-df_indicators['lower'])/(df_indicators['upper']-df_indicators['lower'])
     
     #commodity channel index (CCI)
-    df_indicators['CCI']=(prices_norm-df_indicators['SMA'])/(1.5*prices_norm.std())
-    
+    df_indicators['CCI']=(prices_norm-df_indicators['SMA'])/(1.5*prices_norm.std())    
     df_indicators['OBV']= OBV_df['OBV']
     
     df_indicators = df_indicators.join(stock2)
-#    df_indicators=df_indicators.drop(['price','upper','lower'],axis=1)
-    # df_indicators=df_indicators.dropna()
+
     return df_indicators	
 
 def get_XY_data(symbol = "SPY", sd=dt.datetime(2008,1,1), ed=dt.datetime(2009,12,31), impact=0.0,recent_flag=False): 
@@ -121,12 +117,12 @@ def get_XY_data(symbol = "SPY", sd=dt.datetime(2008,1,1), ed=dt.datetime(2009,12
     #construct the input data dataX for training    
     indicators=df_indicators[['SMA', 'BB_pct', 'CCI', 'OBV', 
                               'close_3_trix','macd','rsi_12','rsi_6','kdjj','adx','cr-ma1','cr-ma2']]
-    indicators.fillna(0,inplace=True)
-    #leave the last 3 rows, since N=3 is used for N-day future return in this project 
+    indicators.fillna(0,inplace=True)    
     
     #use deepcopy
     indicators_copy = copy.deepcopy(indicators)
-    df_dataX=indicators_copy[13:-2] #1/14-12/29, from the 14th day to the last 3th day, omit the first 13 days and the last 2 days
+    df_dataX=indicators_copy[13:-2] #e.g., during a calendar year 1/1-12/31, the df_dataX span from 1/14-12/29, 
+    #from the 14th day to the last 3th day, omit the first 13 days and the last 2 days
     #because for the 1st 13 days there are no SMA, BB_pct and CCI values due to window size of 14
     #ends on 12/29, because condictions on 12/29 predict the actual trading on 12/30, which is based on price on 12/30-12/31
     
@@ -135,11 +131,12 @@ def get_XY_data(symbol = "SPY", sd=dt.datetime(2008,1,1), ed=dt.datetime(2009,12
     YBUY=0.01+impact
     YSELL=-0.01-impact
     # window=2, use indicators of a certain day to predict trading of the next day
-    #the trading label on 12/31 is for actual trading at 1/1 (whether to buy, sell or hold next day)
-    for i in np.arange(len(df_dataX.index))+14:#1/15-12/30,start from the 21st day, because the features on 14th
-        # is used to predict optimal trading on the 15th, ends on 12/30.
-        #2-day return
-        ret=(prices.iloc[i+1]/prices.iloc[i])-1 #3-day return, the optimal trading on the 20th day
+    #the trading label on 12/29 (whether to buy, sell or hold next day) is for actual trading on 12/30 
+    for i in np.arange(len(df_dataX.index))+14:
+        #ideal trading option from 1/15-12/30 (shift 1 day after that of df_dataX ),
+        #because the features on 14th is used to predict optimal actual trading on the 15th.        
+        
+        ret=(prices.iloc[i+1]/prices.iloc[i])-1 #2-day return
         ret=ret.values
         #buy
         if ret>YBUY:
@@ -150,8 +147,9 @@ def get_XY_data(symbol = "SPY", sd=dt.datetime(2008,1,1), ed=dt.datetime(2009,12
         else:
             dataY.append("HOLD")#1
     
-    dataY=np.array(dataY)	 #1/1-12/28, Y on 1/1 is the actual trading predition for 1/2       
-    df_dataY=pd.DataFrame(index=df_dataX.index, columns=["dataY"],data=dataY)  
+    dataY=np.array(dataY)	      
+    df_dataY=pd.DataFrame(index=df_dataX.index, columns=["dataY"],data=dataY) 
+    
     #add libor interest rate and treasury bond rate
     libor=pd.read_csv('tradepal/data/historical-libor-rates.csv',sep=',', index_col=0,
                   delimiter=None, header='infer')	
@@ -172,8 +170,7 @@ def get_XY_data(symbol = "SPY", sd=dt.datetime(2008,1,1), ed=dt.datetime(2009,12
     fill_missing(libor2)		
 		
     indicators=libor2.join(treasury)
-    fill_missing(indicators)
-    
+    fill_missing(indicators)    
   
     return df_dataX, df_dataY, indicators
     #the prediction of trading on 10/1/2020 compares with actual optimal trading on 10/2/2020	
@@ -190,12 +187,11 @@ def fill_missing(prices)	:
 
 def plot_price():
     symbols=["SPY","DIA","QQQ","TLT","IWM"]  
-#    prices=pd.DataFrame(columns=symbols,data=None,index=None)
     sd=dt.datetime(1993,1,29)
     ed=dt.datetime.now()
     dates = pd.date_range(sd, ed)
     prices=get_data(['SPY'],dates)
-    for symbol in ["DIA","QQQ","TLT","IWM"]:		
+    for symbol in symbols:		
         temp_price=get_data([symbol],dates)
         prices=prices.join(temp_price)
     
@@ -210,9 +206,6 @@ def plot_price():
     ax.set_ylabel('Price (normalized)', fontsize=20)  
     ax.legend(loc='best', fontsize=20) 
     
-#    plt.title("Benchmark vs Portfolio", fontsize=15)  		    	 		 		   		 		  
-#    plt.xlabel('Date', fontsize=15)  		   	  			  	 		  		  		    	 		 		   		 		  
-#    plt.ylabel('Price (normalized)', fontsize=15) 
     plt.grid(which='both')
     ax.set_xlim([sd, ed])
     plt.rcParams.update({'font.size': 20})    
@@ -225,6 +218,7 @@ def test_code():
     start_date=dt.datetime(2008,1,1)
     end_date=dt.datetime(2009,12,31)
     symbol='SPY'
+    
     #SMA
     ax=(compute_indicators(symbol,start_date,end_date)[['price','SMA']].plot
         (title='Simple Moving Average (SMA)',figsize=(20,10), fontsize=12))	  		    	 		 		   		 		  
@@ -232,9 +226,6 @@ def test_code():
     ax.set_ylabel('Price (normalized)', fontsize=15)  
     ax.legend(loc='best') 
     
-#    plt.title("Benchmark vs Portfolio", fontsize=15)  		    	 		 		   		 		  
-#    plt.xlabel('Date', fontsize=15)  		   	  			  	 		  		  		    	 		 		   		 		  
-#    plt.ylabel('Price (normalized)', fontsize=15) 
     plt.grid(which='both')
     ax.set_xlim([dt.datetime(2008,1,1), dt.datetime(2009,12,31)])
     plt.rcParams.update({'font.size': 15})    
@@ -247,7 +238,6 @@ def test_code():
         (title='Bollinger Bands percent (%B)', figsize=(20,10), fontsize=12))	  		    	 		 		   		 		  
     ax.set_xlabel('Date')  		   	  			  	 		  		  		    	 		 		   		 		  
     ax.set_ylabel('Price (normalized)') 
-#    plt.axhline(y=0, linestyle=':')
     plt.axhline(y=0.2, linestyle='--')
     plt.axhline(y=0.8, linestyle='--')
     ax.legend(['upper','SMA','lower','%B'],loc='best') 

@@ -99,8 +99,10 @@ class models(object):
         self.X_train = scaler.transform(X_train)
         self.X_test = scaler.transform(X_test)
         self.y_train=y_train
-        self.y_test=y_test	  	
+        self.y_test=y_test	 
         
+    def author(self):  		   	  			  	 		  		  		    	 		 		   		 		  
+        return 'Yaling Liu'  
         
     def XGBoost(self):        
         base = XGBClassifier(n_estimators=200)

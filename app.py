@@ -11,21 +11,9 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from PIL import Image
-
 import datetime as dt
-import pandas as pd
-import numpy as np
-# import ManualStrategy as ms 
-#import StrategyLearner as sl
-#from marketsimcode import compute_portvals,compute_port_stats
-import matplotlib.pyplot as plt
-#import seaborn as sns
-#import calmap        
-#from indicators import normalize_prices
-from tradepal.src.recommend import recommend #recommend_today
+from tradepal.src.recommend import recommend 
 from tradepal.indicators import get_XY_data
-import yfinance as yf
-from datetime import timedelta
 
 
 # Start execution
@@ -40,9 +28,8 @@ def main():
         run_app()
     elif app_mode == "Data Exploration":
         run_data_analysis()
-    # elif app_mode == "Model deep dive":
-    #     run_model_analysis()
 
+# Welcome page
 def welcome():
     f = open("tradepal/resources/intro.md", 'r')
     st.markdown(f.read())
@@ -139,7 +126,7 @@ def run_app():
         image_name='tradepal/resources/back_test_performance_barchart_'+symbol+'.png'
         st.image(load_image(image_name), use_column_width=True)
     
-# Data Analysis app
+# Data Analysis 
 def run_data_analysis(): 
     
     st.title('Index Fund Data Analysis')
@@ -161,16 +148,16 @@ def run_data_analysis():
     st.subheader("Features used in training")
     st.dataframe(df_dataX[30:35])
     st.write("Note: SMA=simple moving average, BB_pct= Bollinger Band percent, CCI=Commodity Channel Index, OBV=On-Balance Volume, macd=moving average convergence divergence, rsi_12=Relative strength index (window is 12), kdjj=stochastic oscillator, adx=Average directional index   ")
-
+    
+    #show performance comparison between ML and benchmark
     st.subheader("Trading performance of different methods measured by normalized market value")
     
-    "During model training period for the SPY fund index, the performance of random forest is much better than those of manual strategy (based on certain trading rules) and benchmark (no trading)"
+    "During model training period for the SPY fund index, the performance of random forest apparently beats the benchmark (buy and hold)."
     st.image(load_image('tradepal/resources/SPY_training.png'), use_column_width=True)
     
-    "Similarly, during model testing period for the SPY fund index, the performance of random forest is also much better than manual strategy and benchmark."
+    "Similarly, during model testing period for the SPY fund index, the performance of random forest is also much better than the benchmark."
   
     st.image(load_image('tradepal/resources/SPY_testing.png'), use_column_width=True)
-
 
 
 @st.cache

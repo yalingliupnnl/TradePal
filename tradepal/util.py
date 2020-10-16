@@ -1,16 +1,17 @@
-"""MLT: Utility code.  		   	  			  	 		  		  		    	 		 		   		 		  
-  		   	  			  	 		  		  		    	 		 		   		 		  
-Copyright 2017, Georgia Tech Research Corporation  		   	  			  	 		  		  		    	 		 		   		 		  
-Atlanta, Georgia 30332-0415  		   	  			  	 		  		  		    	 		 		   		 		  
-All Rights Reserved  		   	  			  	 		  		  		    	 		 		   		 		  
-"""  		   	  			  	 		  		  		    	 		 		   		 		  
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Sep 22 10:57:10 2020
+
+@author: yalingliu
+"""	   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
 import os  		   	  	
 import numpy as np		  	 		  		  		    	 		 		   		 		  
 import pandas as pd  		   	
 import datetime as dt 
 from math import log 			  	 		  	
-# from indicators import compute_indicators, normalize_prices  		    	 		 		   		 		  
+		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
 def symbol_to_path(symbol, base_dir=None):  		   	  			  	 		  		  		    	 		 		   		 		  
     """Return CSV file path given ticker symbol."""  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -20,9 +21,7 @@ def symbol_to_path(symbol, base_dir=None):
   		   	  			  	 		  		  		    	 		 		   		 		  
 def get_data(symbols, dates, addSPY=True, colname = 'Adj Close'):  		   	  			  	 		  		  		    	 		 		   		 		  
     """Read stock data (adjusted close) for given symbols from CSV files."""  		   	  			  	 		  		  		    	 		 		   		 		  
-    df = pd.DataFrame(index=dates)  		   	  			  	 		  		  		    	 		 		   		 		  
-#    if addSPY and 'SPY' not in symbols:  # add SPY for reference, if absent  		   	  			  	 		  		  		    	 		 		   		 		  
-#        symbols = ['SPY'] + symbols  		   	  			  	 		  		  		    	 		 		   		 		  
+    df = pd.DataFrame(index=dates)  		   	  			  	 		  		  		    	 		 		   		 		  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
     for symbol in symbols:  		   	  			  	 		  		  		    	 		 		   		 		  
         df_temp = pd.read_csv(symbol_to_path(symbol), index_col='Date',  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -36,9 +35,7 @@ def get_data(symbols, dates, addSPY=True, colname = 'Adj Close'):
 
 def get_vol(symbols, dates, addSPY=True, colname = 'Volume'):  		   	  			  	 		  		  		    	 		 		   		 		  
     """Read stock data (adjusted close) for given symbols from CSV files."""  		   	  			  	 		  		  		    	 		 		   		 		  
-    df = pd.DataFrame(index=dates)  		   	  			  	 		  		  		    	 		 		   		 		  
-#    if addSPY and 'SPY' not in symbols:  # add SPY for reference, if absent  		   	  			  	 		  		  		    	 		 		   		 		  
-#        symbols = ['SPY'] + symbols  		   	  			  	 		  		  		    	 		 		   		 		  
+    df = pd.DataFrame(index=dates)  		   	  			  	 		  		  		    	 		 		   		 		  	   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
     for symbol in symbols:  		   	  			  	 		  		  		    	 		 		   		 		  
         df_temp = pd.read_csv(symbol_to_path(symbol), index_col='Date',  		   	  			  	 		  		  		    	 		 		   		 		  
