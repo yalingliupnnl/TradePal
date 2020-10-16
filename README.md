@@ -1,5 +1,6 @@
 # TradePal
 #### A Free, Transparent and Efficient Stock Trading Assistant (Web App) Powered by Machine Learning
+Please contact the developer Dr. Yaling Liu (cauliuyaling@gmail.com) if you have any questions.
 
 ## Motivation:
 As we all know, the stock market is very risky, at the same time the professional wealth management services are pricey, thus regular non-professional stockholders face great risks in stock trading. This project addresses this headache by providing a free, transparent and efficient web app powered by machine learning to help non-professionals improve their performances on stock trading. 
