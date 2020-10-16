@@ -1,5 +1,5 @@
 # TradePal
-#### A Free, Transparent and Efficient Stock Trading Assistant Powered by Machine Learning
+#### A Free, Transparent and Efficient Stock Trading Assistant (Web App) Powered by Machine Learning
 
 ## Motivation:
 As we all know, the stock market is very risky, at the same time the professional wealth management services are pricey, thus regular non-professional stockholders face great risks in stock trading. This project addresses this headache by providing a free, transparent and efficient web app powered by machine learning to help non-professionals improve their performances on stock trading. 
@@ -41,7 +41,7 @@ All the data, sources codes and related resources are included in the directory 
 
 
 
-## Setup
+## App Setup
 Clone repository
 ```
 git clone https://github.com/yalingliupnnl/TradePal.git
@@ -62,7 +62,7 @@ pip install -r requirements.txt
 ```
 
 
-## Run Streamlit App
+## Run TradePal App
 ```
 streamlit run app.py
 ```
@@ -84,7 +84,7 @@ Optional: Docker build
 docker build -t cloudwine-train:v1 -f Dockerfile.train . 
 ```-->
 
-## Deploy to Google Kubernetes Engine (GKE)
+## Deploy TradePal to Google Kubernetes Engine (GKE)
 Based off the intruction from Google's 'Deploying a containerized web application' (https://cloud.google.com/kubernetes-engine/docs/tutorials/hello-app).
 
 Prerequisites:
