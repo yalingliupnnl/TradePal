@@ -13,8 +13,8 @@ import pickle
 import glob
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import model_from_json
-from tradepal.util import genearte_input_sequence
-from tradepal.indicators import get_XY_data
+from tradepal.src.util import genearte_input_sequence
+from tradepal.src.indicators import get_XY_data
 from sklearn.preprocessing import LabelEncoder
 import matplotlib.pyplot as plt
 

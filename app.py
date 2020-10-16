@@ -13,7 +13,7 @@ import numpy as np
 from PIL import Image
 import datetime as dt
 from tradepal.src.recommend import recommend 
-from tradepal.indicators import get_XY_data
+from tradepal.src.indicators import get_XY_data
 
 
 # Start execution

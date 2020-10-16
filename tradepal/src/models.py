@@ -28,8 +28,8 @@ from tensorflow.keras.layers import LSTM, Dense, LeakyReLU, Dropout, Masking,Inp
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
-from tradepal.util import split_sequence
-from tradepal.indicators import get_XY_data	  	 		  		  		    	 		 		   		 		  
+from tradepal.src.util import split_sequence
+from tradepal.src.indicators import get_XY_data	  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
 class models(object):  		
    	  			  	 		  		  		    	 		 		   		 		  		   	  			  	 		  		  		    	 		 		   		 		  

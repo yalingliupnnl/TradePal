@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd   	  			  	 		  		  		    	 		 		   		 		  
 import datetime as dt 
 from datetime import timedelta	  		  		    	 		 		   		 		  
-from tradepal.util import get_data, get_vol,plot_data  
+from tradepal.src.util import get_data, get_vol,plot_data  
 import matplotlib.pyplot as plt		  
 import stockstats
 import copy
