@@ -1,8 +1,28 @@
 # TradePal
-#### A Free, Transparent and Efficient Stock Trading Assistant Powered by Machine Learning
+#### A Free, Transparent and Efficient Stock Trading Assistant (Web App) Powered by Machine Learning
 
-## Motivation for this project:
-As we all know, the stock market is very risky, at the same time the professional wealth management services are pricey, thus regular non-professional stockholders face great risks in stock trading. This project addresses this headache by providing a free, transparent and efficient web app powered by machine learning to help non-professionals on stock trading, by providing the predictions of today's optial trading option (Buy, Sell or Hold) as well as final recommendation. In addition, the app provides backtesting results in the past 3 years from all the 5 machine learning models such that the user can make their own trading decision based on those results. 
+## Motivation:
+As we all know, the stock market is very risky, at the same time the professional wealth management services are pricey, thus regular non-professional stockholders face great risks in stock trading. This project addresses this headache by providing a free, transparent and efficient web app powered by machine learning to help non-professionals improve their performances on stock trading. 
+
+## Functionalities:
+The TradePal web app offers trading predictions, recommendations and relevant results for 5 representative index funds that track major stock indices:
+- SPY (SP 500)
+- DIA (Dow Jones Industrial Average)
+- QQQ (Nasdaq 100),
+- TLT (U.S. Treasury 20+ Year Bond)
+- IWM (Russell 2000)<br />
+
+The app is powered by 5 widely-used machine learning models:
+- Logistic Regression
+- Random Forest
+- Ada Boosting 
+- Support Vector Machine
+- Long Short-Term Memory<br />
+
+Specifically, it has the following functionalities:
+- provides model-specific prediction of today's optial trading option (Buy, Sell or Hold) by each of the 5 machine learning models.
+- provides final recommendation for today's optial trading option. 
+- provides backtesting results in the past 3 years from all the 5 models such that the user can make their own trading decision based on those results. 
 
 The figure below presents a bried demo of the TradePal web app.
 
@@ -10,9 +30,10 @@ The figure below presents a bried demo of the TradePal web app.
 
 ## Structure of this repository
 All the data, sources codes and related resources are included in the directory `tradpal`, and the contents of each subdirectory are described below.<br />
-`1) data:` all the related source data (e.g., historical stock prices, historical US dollar LIBOR interest rates) reside here.  <br /><br />
-`2) models:` all the source codes for the 5 machine learning models, and the well-trained models and associated parameters reside here. The source codes for the lstm model are in the file `lstm.py` and lstm is trained separately using `lstm_grid_search.py` to seek the best hyperparameters. Source codes for all 4 other models reside in the `models.py` file, which is rendered in object oriented programming (OOP). The file `recommend.py` is used to provides the fund- and model-specific prediction for today's trading option and the app's final recommendation as well.<br /><br />
-`3) resources:` all supporting images and auxillary resources for the app reside here.  <br /><br />
+- `data:` all the related source data (e.g., historical stock prices, historical US dollar LIBOR interest rates) reside here.  <br /><br />
+- `models:` all the well-trained models and associated parameters reside here. <br /><br />
+- `resources:` all supporting images and auxillary resources for the app reside here.  <br /><br />
+- `src:` all the source codes for the 5 machine learning models reside here, which is rendered in object oriented programming (OOP). The hyperparameters of the lstm model are tuned separately using the codes in `lstm_grid_search.py`. The file `recommend.py` is used to provides the fund- and model-specific prediction for today's trading option and the app's final recommendation as well.
 
 
 
@@ -20,7 +41,7 @@ All the data, sources codes and related resources are included in the directory 
 
 
 
-## Setup
+## App Setup
 Clone repository
 ```
 git clone https://github.com/yalingliupnnl/TradePal.git
@@ -41,7 +62,7 @@ pip install -r requirements.txt
 ```
 
 
-## Run Streamlit App
+## Run TradePal App
 ```
 streamlit run app.py
 ```
@@ -63,7 +84,7 @@ Optional: Docker build
 docker build -t cloudwine-train:v1 -f Dockerfile.train . 
 ```-->
 
-## Deploy to Google Kubernetes Engine (GKE)
+## Deploy TradePal to Google Kubernetes Engine (GKE)
 Based off the intruction from Google's 'Deploying a containerized web application' (https://cloud.google.com/kubernetes-engine/docs/tutorials/hello-app).
 
 Prerequisites:
