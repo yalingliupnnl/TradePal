@@ -110,16 +110,18 @@ def recommend_all():
         df_dataX, df_dataY, df_indicators=get_XY_data(symbol, sd=dt.datetime.now().date()-dt.timedelta(1115), 
                                                   ed=dt.datetime.now().date(),impact=0.0,recent_flag=True)#
         
-        #prediction results for the the past 22 transaction days, the prediction on 10/1 corresponds
-        #to actual optimal trading on 10/2, so the index here shift 1 day forward just for the sake of plotting
+        #prediction results for the the past nn (750) transaction days, the prediction on 10/1 corresponds
+        #to actual optimal trading on 10/2, so the index of results (trading option) here shift 1 day forward 
+        #just for the sake of plotting
         nn=750
         results_past=pd.DataFrame(columns=models,data=None,index=df_indicators.index[-(nn+1):-1])
         
         labelencoder = LabelEncoder()
         df_dataY['encode']=labelencoder.fit_transform(df_dataY['dataY'])
         y_true=df_dataY['encode']
-        #start from -24th day to -3 day, because the last 2 days are omitted
-        #e.g., for day 1-24, features of day 22 is used to predict optimal trading on day 23 (Y-label),
+        
+        #the last 2 days are omitted
+        #e.g., for day 1-24, features of day 22 is used to predict actual optimal trading on day 23 (Y-label),
         # which is determined by price on day 24, so day 23 and 24 are omited in Y label.
         idx1=y_true.index.get_loc(df_indicators.index[-(nn+2)].date().isoformat())
         
@@ -127,17 +129,15 @@ def recommend_all():
         for mod in models:
             results.loc[symbol,mod], model = recommend(symbol,mod)
             
-            #get the prediction resutls of the past 22 transaction days
+            #get the prediction resutls of the past nn(750) transaction days
             if mod!='lstm':
-#                idx=df_indicators.index.get_loc((dt.datetime.now().date()-dt.timedelta(30)).isoformat())
                 X_past=df_indicators.iloc[-(nn+2):-2,:].values
 
             else:
                 filename=glob.glob('tradepal/models/lstm_best_para.csv')
                 best_para=pd.read_csv(filename[0], sep=',', index_col=1,delimiter=None, header='infer')                 
                 best_lookback=best_para.loc[symbol,'lookback']
-                X_past=df_indicators.iloc[-(nn+best_lookback+2):-2,:].values
-#            
+                X_past=df_indicators.iloc[-(nn+best_lookback+2):-2,:].values          
                 
             #make prediction for today's trading option
             if mod !='lstm':
@@ -151,9 +151,6 @@ def recommend_all():
             if mod not in ['lstm']:   
                 for i in np.arange(len(y_past)):
                     y_option[i]=y_past[i].astype(int) 
-#            elif mod =='DNN':
-#                for i in np.arange(len(y_past)):
-#                    y_option[i]=np.argmax(y_past[i])
             elif mod=='lstm':
                 y_option=y_past
             
@@ -169,11 +166,9 @@ def recommend_all():
         
         #plot the map out
         fig = plt.figure(figsize=(10, 6), dpi=80, facecolor='w', edgecolor='k')
-        ax = fig.add_subplot(111)
-        
-#        test=pd.read_csv('test.csv',index_col=0)
+        ax = fig.add_subplot(111)    
         cax = ax.matshow(perform.T, interpolation=None, aspect='auto', cmap='RdYlGn')
-#        fig.colorbar(cax)
+
         # Add colorbar, make sure to specify tick locations to match desired ticklabels
         cbar = fig.colorbar(cax, ticks=[-1, 0, 1])
         cbar.ax.set_yticklabels(['-1', '0', '1'], fontsize=16)  # vertically oriented colorbar
