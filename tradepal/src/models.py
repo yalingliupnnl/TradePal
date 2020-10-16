@@ -30,7 +30,8 @@ from tensorflow.keras.regularizers import l2
 from tradepal.src.util import split_sequence
 from tradepal.src.indicators import get_XY_data	  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
-class models(object):		  		  		    	 		 		   		 		  		   	  			  	 		  		  		    	 		 		   		 		  
+class models(object):	
+    # constructor 	  		  		    	 		 		   		 		  		   	  			  	 		  		  		    	 		 		   		 		  
     def __init__(self, symbol = "SPY", sd=dt.datetime(1993,1,29), ed=dt.datetime(2020,8,31), impact=0.0):  
         self.symbol = symbol
         self.impact = impact 
