@@ -7,12 +7,7 @@ FROM python:3.7
 # copy local files into container
 COPY app.py /tmp/
 COPY requirements.txt /tmp/
-COPY tradinghelper /tmp/tradinghelper
-COPY StrategyLearner.py /tmp/StrategyLearner.py
-COPY RTLearner.py /tmp/RTLearner.py
-COPY BagLearner.py /tmp/BagLearner.py
-COPY indicators.py /tmp/indicators.py
-COPY marketsimcode.py /tmp/marketsimcode.py
+COPY tradepal /tmp/tradepal
 
 #COPY data /tmp/data
 # .streamlit for something to do with making enableCORS=False
